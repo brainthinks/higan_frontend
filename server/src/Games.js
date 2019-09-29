@@ -58,6 +58,7 @@ module.exports = class Games {
     assert.ok(Array.isArray(games), new Error('Cannot construct Games from anything other than array.'));
 
     this.games = {};
+    this.ids = [];
 
     for (let i = 0; i < games.length; i++) {
       const game = games[i];
@@ -66,16 +67,38 @@ module.exports = class Games {
     }
   }
 
+  get length () {
+    return this.ids.length;
+  }
+
   add (game) {
     assert.ok(Game.isGame(game), new Error('Cannot add anything but a Game instance.'));
 
-    this.games[game.id] = game;
+    const id = game.id;
+
+    this.ids.push(id)
+    this.games[id] = game;
 
     return this;
   }
 
   removeById () {
     // @todo
+  }
+
+  forEach (fn) {
+    for (let i = 0; i < this.length; i++) {
+      const id = this.ids[i];
+      const game = this.games[id];
+
+      const result = fn(game, id, i);
+
+      if (result === false) {
+        return this;
+      }
+    }
+
+    return this;
   }
 
   toObjects () {

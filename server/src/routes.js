@@ -2,9 +2,9 @@
 
 const express = require('express');
 
-const Games = require('./Games');
+const utils = require('./utils');
 
-module.exports = (config) => {
+module.exports = (games) => {
   const routes = [
     {
       method: 'use',
@@ -13,18 +13,30 @@ module.exports = (config) => {
         express.static('artwork'),
       ],
     },
-    {
-      method: 'get',
-      path: '/games/nes',
+  ];
+
+  games.forEach((game, id) => {
+    console.log(id)
+    routes.push({
+      method: 'post',
+      path: `/games/nes/${id}/play`,
       middleware: [
         async (req, res, next) => {
-          const games = await Games.fromDirectory(config.gameConsole, config.nesRomsDirectory, config.nesExtensions);
-
-          res.send(games.toObjects());
-        }
+          utils.run('higan', [ '--fullscreen', game.pathToFile ]);
+        },
       ],
-    }
-  ];
+    });
+  });
+
+  routes.push({
+    method: 'get',
+    path: '/games/nes',
+    middleware: [
+      async (req, res, next) => {
+        res.send(games.toObjects());
+      }
+    ],
+  });
 
   return routes;
 };

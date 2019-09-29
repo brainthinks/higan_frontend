@@ -1,13 +1,21 @@
 'use strict';
 
 const express = require('express');
-const app = express();
-const port = 3000;
+const cors = require('cors')
 
+const Games = require('./Games');
 const _routes = require('./routes');
 
+const port = 3000;
+
 module.exports = async (config) => {
-  const routes = _routes(config);
+  const games = await Games.fromDirectory(config.gameConsole, config.nesRomsDirectory, config.nesExtensions);
+
+  const routes = _routes(games);
+  const app = express();
+
+  // @todo - for development use only!
+  app.use(cors({ origin: true }));
 
   for (let i = 0; i < routes.length; i++) {
     const route = routes[i];
@@ -16,7 +24,13 @@ module.exports = async (config) => {
     app[route.method](route.path, ...middleware);
   }
 
-  app.get('*', (req, res) => res.send('404'));
+  // Catch-all
+  app.use('*', (req, res) => {
+    console.log(`404 ${req.originalUrl}`);
+    res.status(404).send('404');
+  });
+
+  // @todo - error handler
 
   await new Promise((resolve, reject) => {
     app.listen(port, () => {
