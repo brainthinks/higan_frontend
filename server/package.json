@@ -1,0 +1,16 @@
+{
+  "name": "higan_frontend_server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "serve": "node index.js",
+    "serve:dev": "node-dev index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "glob": "^7.1.4",
+    "node-dev": "^4.0.0",
+    "uuid": "^3.3.3"
+  }
+}
